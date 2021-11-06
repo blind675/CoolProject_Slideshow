@@ -3,8 +3,9 @@ import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 
 export default function Home() {
-  const [refreshInterval, setRefreshInterval] = useState(10000);
+  const [refreshInterval, setRefreshInterval] = useState(1000);
   const [photoUrl, setPhotoUrl] = useState();
+  const [remainingSeconds, setRemainingSeconds] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -31,17 +32,45 @@ export default function Home() {
     }
   }, [refreshInterval]);
 
+  useEffect(() => {
+    const ticker = setInterval(() => {
+      if (remainingSeconds < 2) {
+        setRemainingSeconds(refreshInterval / 1000);
+      } else {
+        setRemainingSeconds(remainingSeconds - 1)
+      }
+
+    }, 1000);
+
+    return () => {
+      clearInterval(ticker);
+    }
+  }, [refreshInterval, remainingSeconds]);
+
   return (
     <div className={styles.container}>
-      {photoUrl &&
-        <Image
-          src={photoUrl}
-          alt="Landscape picture"
-          layout='fill'
-        />
+      {photoUrl ? (
+        <>
+          <Image
+            src={photoUrl}
+            alt="Landscape picture"
+            layout='fill'
+          />
+          <div className={styles.textOverContainer}><p className={styles.textOver}>{remainingSeconds}</p></div>
+        </>
+      ) : (
+        <div className={styles.ldsRing}>
+          <div>
+          </div>
+          <div>
+          </div>
+          <div>
+          </div>
+          <div>
+          </div>
+        </div>
+      )
       }
     </div>
   )
 }
-
-// "https://cdn.wallpapersafari.com/17/19/KXJzAU.jpg"
